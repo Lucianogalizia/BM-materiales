@@ -8,7 +8,7 @@ app.secret_key = 'your_secret_key'  # Cambia la clave para producción
 # Variable global para almacenar los DataFrames finales de cada flujo
 materiales_finales = []
 
-# Función para renombrar las columnas y dejar solo las 5 requeridas (no se modificó la lógica)
+# Función para renombrar las columnas y dejar solo las 5 requeridas (sin modificar la lógica)
 def renombrar_columnas(df):
     df_renombrado = df.rename(
         columns={
@@ -23,7 +23,7 @@ def renombrar_columnas(df):
     columnas_presentes = [col for col in columnas if col in df_renombrado.columns]
     return df_renombrado[columnas_presentes]
 
-# Plantilla base (utiliza Bootstrap para un estilo moderno)
+# Plantilla base (se utiliza Bootstrap para un estilo moderno y se incluye main.js)
 base_template = """
 <!doctype html>
 <html lang="en">
@@ -48,7 +48,10 @@ base_template = """
       {% endwith %}
       {{ content|safe }}
     </div>
+    <!-- Bootstrap Bundle JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Archivo JavaScript personalizado -->
+    <script src="{{ url_for('static', filename='main.js') }}"></script>
   </body>
 </html>
 """
@@ -80,10 +83,8 @@ def flujo_a():
     """
     return render_template_string(base_template, title="FLUJO A: Ajuste de medida", content=content)
 
-# Página de filtros para FLUJO A
 @app.route('/flujo_a/filters', methods=['GET', 'POST'])
 def flujo_a_filters():
-    # Se carga el Excel correspondiente (se asume que el archivo se encuentra en la carpeta "materiales")
     file_path = os.path.join("materiales", "ajuste de medida(2).xlsx")
     try:
         df = pd.read_excel(file_path)
@@ -116,7 +117,6 @@ def flujo_a_filters():
                 "acero_cup_list": acero_cup_list,
                 "tipo_cup_list": tipo_cup_list
             }
-        # Se aplica el mismo filtrado que en el código original
         final_condition = pd.Series([False] * len(df))
         for diam_value, fdict in filters.items():
             temp_cond_diam = pd.Series([False] * len(df))
@@ -131,9 +131,7 @@ def flujo_a_filters():
         final_df = df[final_condition]
         final_df_renombrado = renombrar_columnas(final_df)
         materiales_finales.append(("FLUJO A", final_df_renombrado))
-        # Se salta directamente a FLUJO H como en la lógica original
         return redirect(url_for('flujo_h'))
-    # Se construye el formulario dinámicamente para cada DIÁMETRO
     form_fields = ""
     for diam in diam_options:
         subset = df[df["DIÁMETRO"]==diam]
@@ -296,7 +294,6 @@ def flujo_c():
     if request.method == 'POST':
         baja_option = request.form.get('baja')
         if baja_option == "SI":
-            # Aquí se podría implementar la selección de DIÁMETRO, TIPO, etc. según la lógica original.
             df_renombrado = renombrar_columnas(df)
             materiales_finales.append(("FLUJO C", df_renombrado))
             return redirect(url_for('flujo_d'))
@@ -336,7 +333,6 @@ def flujo_d():
     if request.method == 'POST':
         profundizar = request.form.get('profundizar')
         if profundizar == "SI":
-            # Se asume que se realizan las selecciones e ingreso de cantidades según la lógica original
             df_renombrado = renombrar_columnas(df)
             materiales_finales.append(("FLUJO D", df_renombrado))
             return redirect(url_for('flujo_e'))
@@ -373,7 +369,6 @@ def flujo_e():
     if request.method == 'POST':
         varilla = request.form.get('varilla')
         if varilla == "SI":
-            # Se aplica la lógica de filtrado similar a FLUJO A (se puede ampliar según el código original)
             final_df = df
             final_df_renombrado = renombrar_columnas(final_df)
             materiales_finales.append(("FLUJO E", final_df_renombrado))
@@ -542,6 +537,12 @@ def final():
 
 # Página de inicio: redirige al Flujo A
 @app.route('/')
+def index():
+    return redirect(url_for('flujo_a'))
+
+if __name__ == '__main__':
+    app.run(debug=True)
+
 def index():
     return redirect(url_for('flujo_a'))
 
