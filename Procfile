@@ -1,2 +1,2 @@
-web: voila BOMBEO MECANICO.ipynb --port=$PORT --no-browser
+web: voila "BOMBEO MECANICO.ipynb" --port=$PORT --no-browser
 
