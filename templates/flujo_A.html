@@ -5,10 +5,10 @@
 <div class="container mt-4">
   <h2>FLUJO A: Filtros para Ajuste de medida</h2>
   
-  <!-- Formulario que envía la selección final al servidor -->
-  <form id="flujoAForm" method="POST" action="/flujoA" enctype="multipart/form-data">
+  <!-- Formulario que envía la selección final al servidor (POST /flujoA) -->
+  <form id="flujoAForm" method="POST" action="/flujoA">
     
-    <!-- Opción SI o NO -->
+    <!-- Radio Buttons SI/NO -->
     <div class="mb-3">
       <label class="form-label">¿Ajuste de medida?</label><br>
       <div class="form-check form-check-inline">
@@ -21,16 +21,16 @@
       </div>
     </div>
 
-    <!-- Sección para la selección de DIÁMETROS (oculta si NO se elige "SI") -->
+    <!-- Sección que sólo se muestra si el usuario elige "SI" -->
     <div id="diametroSection" class="mb-3" style="display:none;">
       <label for="diametros" class="form-label">Seleccione DIÁMETRO(s)</label>
       <select class="form-select" id="diametros" name="diametros" multiple>
-        <!-- Estas opciones se llenan dinámicamente con JavaScript (o desde el backend) -->
+        <!-- Estas opciones se llenarán dinámicamente con JavaScript usando diamData -->
       </select>
       <small class="text-muted">Use Ctrl/Cmd para seleccionar múltiples opciones.</small>
     </div>
 
-    <!-- Contenedor donde se generarán los pick lists de TIPO, GRADO DE ACERO, ACERO CUPLA, TIPO CUPLA -->
+    <!-- Contenedor para las opciones (TIPO, GRADO_ACERO, etc.) -->
     <div id="optionsContainer"></div>
 
     <button type="submit" class="btn btn-primary">Aplicar Filtros</button>
@@ -40,149 +40,130 @@
 
 {% block scripts %}
 <script>
-// ----------------------------------------------------------------------
-// Ejemplo de datos en un objeto JavaScript.
-// En un caso real, podrías generar este objeto desde tu backend, con
-// los datos leídos del Excel y convertirlos a JSON para usarlos aquí.
-//
-// Cada key (p.e. "0.875") representa un DIÁMETRO. El value es otro objeto
-// que contiene arrays con las opciones de TIPO, ACERO, ACERO_CUPLA, TIPO_CUPLA.
-// ----------------------------------------------------------------------
-const diamData = {
-  "0.875": {
-    "TIPO":         ["TipoA", "TipoB", "TipoC"],
-    "ACERO":        ["Acero1", "Acero2"],
-    "ACERO_CUPLA":  ["Cupla1", "Cupla2"],
-    "TIPO_CUPLA":   ["TC1", "TC2"]
-  },
-  "1.0": {
-    "TIPO":         ["TipoX", "TipoY"],
-    "ACERO":        ["Acero3", "Acero4"],
-    "ACERO_CUPLA":  ["CuplaX", "CuplaY"],
-    "TIPO_CUPLA":   ["TCX", "TCY"]
-  }
-  // Agrega aquí todos los diámetros que manejes en tu Excel
-};
+  // Obtenemos el objeto diamData desde la variable de plantilla
+  // diamData viene como un string JSON, lo parseamos a objeto JS
+  const diamData = JSON.parse('{{ diamData | safe }}');
 
-// ----------------------------------------------------------------------
-// Lógica para mostrar/ocultar la sección de DIÁMETROS según SI/NO
-// ----------------------------------------------------------------------
-document.getElementById('ajusteMedidaSI').addEventListener('change', function() {
-  if (this.checked) {
-    document.getElementById('diametroSection').style.display = 'block';
-  }
-});
-document.getElementById('ajusteMedidaNO').addEventListener('change', function() {
-  if (this.checked) {
-    document.getElementById('diametroSection').style.display = 'none';
-    // Limpiamos la sección de picklists
-    document.getElementById('optionsContainer').innerHTML = '';
-  }
-});
+  // Radio Buttons: mostrar u ocultar la sección de diámetros
+  const radioSI = document.getElementById('ajusteMedidaSI');
+  const radioNO = document.getElementById('ajusteMedidaNO');
+  const diamSection = document.getElementById('diametroSection');
+  const optionsContainer = document.getElementById('optionsContainer');
+  const diamSelect = document.getElementById('diametros');
 
-// ----------------------------------------------------------------------
-// Llenamos el <select> de DIÁMETROS con los keys de diamData
-// ----------------------------------------------------------------------
-const diametrosSelect = document.getElementById('diametros');
-for (const diam in diamData) {
-  let option = document.createElement('option');
-  option.value = diam;
-  option.text = diam;
-  diametrosSelect.appendChild(option);
-}
-
-// ----------------------------------------------------------------------
-// Cada vez que el usuario cambia la selección de DIÁMETROS, generamos
-// dinámicamente los pick lists de TIPO, ACERO, ACERO CUPLA y TIPO CUPLA
-// para cada DIÁMETRO seleccionado.
-// ----------------------------------------------------------------------
-diametrosSelect.addEventListener('change', function() {
-  const selectedDiam = Array.from(this.selectedOptions).map(o => o.value);
-  const container = document.getElementById('optionsContainer');
-  container.innerHTML = ''; // Limpiamos contenido anterior
-
-  selectedDiam.forEach(d => {
-    // Creamos un contenedor (div) para cada DIÁMETRO seleccionado
-    const sectionDiv = document.createElement('div');
-    sectionDiv.classList.add('border', 'p-3', 'mb-3');
-    sectionDiv.innerHTML = `<h5 class="mb-3">Opciones para DIÁMETRO: ${d}</h5>`;
-
-    // --------------------- TIPO ---------------------
-    const tipoLabel = document.createElement('label');
-    tipoLabel.classList.add('form-label');
-    tipoLabel.textContent = 'TIPO (seleccione):';
-    sectionDiv.appendChild(tipoLabel);
-
-    const tipoSelect = document.createElement('select');
-    tipoSelect.name = `tipo_${d}[]`;  // p.e. tipo_0.875[]
-    tipoSelect.classList.add('form-select', 'mb-3');
-    tipoSelect.multiple = true;       // Permite seleccionar varios TIPO
-    diamData[d]["TIPO"].forEach(item => {
-      let opt = document.createElement('option');
-      opt.value = item;
-      opt.text = item;
-      tipoSelect.appendChild(opt);
-    });
-    sectionDiv.appendChild(tipoSelect);
-
-    // --------------------- GRADO DE ACERO ---------------------
-    const aceroLabel = document.createElement('label');
-    aceroLabel.classList.add('form-label');
-    aceroLabel.textContent = 'GRADO DE ACERO (seleccione):';
-    sectionDiv.appendChild(aceroLabel);
-
-    const aceroSelect = document.createElement('select');
-    aceroSelect.name = `acero_${d}[]`;  // p.e. acero_0.875[]
-    aceroSelect.classList.add('form-select', 'mb-3');
-    aceroSelect.multiple = true;
-    diamData[d]["ACERO"].forEach(item => {
-      let opt = document.createElement('option');
-      opt.value = item;
-      opt.text = item;
-      aceroSelect.appendChild(opt);
-    });
-    sectionDiv.appendChild(aceroSelect);
-
-    // --------------------- ACERO CUPLA ---------------------
-    const aceroCupLabel = document.createElement('label');
-    aceroCupLabel.classList.add('form-label');
-    aceroCupLabel.textContent = 'ACERO CUPLA (seleccione):';
-    sectionDiv.appendChild(aceroCupLabel);
-
-    const aceroCupSelect = document.createElement('select');
-    aceroCupSelect.name = `acero_cupla_${d}[]`;
-    aceroCupSelect.classList.add('form-select', 'mb-3');
-    aceroCupSelect.multiple = true;
-    diamData[d]["ACERO_CUPLA"].forEach(item => {
-      let opt = document.createElement('option');
-      opt.value = item;
-      opt.text = item;
-      aceroCupSelect.appendChild(opt);
-    });
-    sectionDiv.appendChild(aceroCupSelect);
-
-    // --------------------- TIPO CUPLA ---------------------
-    const tipoCupLabel = document.createElement('label');
-    tipoCupLabel.classList.add('form-label');
-    tipoCupLabel.textContent = 'TIPO CUPLA (seleccione):';
-    sectionDiv.appendChild(tipoCupLabel);
-
-    const tipoCupSelect = document.createElement('select');
-    tipoCupSelect.name = `tipo_cupla_${d}[]`;
-    tipoCupSelect.classList.add('form-select', 'mb-3');
-    tipoCupSelect.multiple = true;
-    diamData[d]["TIPO_CUPLA"].forEach(item => {
-      let opt = document.createElement('option');
-      opt.value = item;
-      opt.text = item;
-      tipoCupSelect.appendChild(opt);
-    });
-    sectionDiv.appendChild(tipoCupSelect);
-
-    // Agregamos todo al contenedor principal
-    container.appendChild(sectionDiv);
+  radioSI.addEventListener('change', () => {
+    if (radioSI.checked) {
+      diamSection.style.display = 'block';
+    }
   });
-});
+  radioNO.addEventListener('change', () => {
+    if (radioNO.checked) {
+      diamSection.style.display = 'none';
+      optionsContainer.innerHTML = '';
+    }
+  });
+
+  // 1) Llenamos el <select> de DIÁMETROS con las keys de diamData
+  //    (p.e. "0.875", "1.0", etc.)
+  for (const diam in diamData) {
+    let option = document.createElement('option');
+    option.value = diam; // "0.875"
+    option.textContent = diam;
+    diamSelect.appendChild(option);
+  }
+
+  // 2) Cada vez que el usuario cambia la selección de DIÁMETROS,
+  //    generamos dinámicamente los pick-lists para TIPO, GRADO_ACERO,
+  //    GRADO_ACERO_CUPLA, TIPO_DE_CUPLA, etc.
+  diamSelect.addEventListener('change', function() {
+    // Obtenemos la lista de DIÁMETROS seleccionados
+    const selected = Array.from(this.selectedOptions).map(o => o.value);
+    // Limpiamos el contenedor para no duplicar
+    optionsContainer.innerHTML = '';
+
+    selected.forEach(d => {
+      // Creamos un div "card" para cada DIÁMETRO
+      const sectionDiv = document.createElement('div');
+      sectionDiv.classList.add('border', 'p-3', 'mb-3');
+      sectionDiv.innerHTML = `<h5 class="mb-3">Opciones para DIÁMETRO: ${d}</h5>`;
+
+      // TIPO
+      const labelTipo = document.createElement('label');
+      labelTipo.classList.add('form-label');
+      labelTipo.textContent = 'TIPO (seleccione):';
+      sectionDiv.appendChild(labelTipo);
+
+      const selectTipo = document.createElement('select');
+      // Importante: name="tipo_diam[]" para que en el POST se identifique
+      selectTipo.name = `tipo_${d}[]`;
+      selectTipo.classList.add('form-select', 'mb-3');
+      selectTipo.multiple = true; // Permite selección múltiple
+      (diamData[d].TIPO || []).forEach(item => {
+        const opt = document.createElement('option');
+        opt.value = item;
+        opt.textContent = item;
+        selectTipo.appendChild(opt);
+      });
+      sectionDiv.appendChild(selectTipo);
+
+      // GRADO_ACERO
+      const labelAcero = document.createElement('label');
+      labelAcero.classList.add('form-label');
+      labelAcero.textContent = 'GRADO DE ACERO (seleccione):';
+      sectionDiv.appendChild(labelAcero);
+
+      const selectAcero = document.createElement('select');
+      selectAcero.name = `acero_${d}[]`;
+      selectAcero.classList.add('form-select', 'mb-3');
+      selectAcero.multiple = true;
+      (diamData[d].GRADO_ACERO || []).forEach(item => {
+        const opt = document.createElement('option');
+        opt.value = item;
+        opt.textContent = item;
+        selectAcero.appendChild(opt);
+      });
+      sectionDiv.appendChild(selectAcero);
+
+      // GRADO_ACERO_CUPLA
+      const labelAceroCupla = document.createElement('label');
+      labelAceroCupla.classList.add('form-label');
+      labelAceroCupla.textContent = 'GRADO DE ACERO CUPLA (seleccione):';
+      sectionDiv.appendChild(labelAceroCupla);
+
+      const selectAceroCupla = document.createElement('select');
+      selectAceroCupla.name = `acero_cupla_${d}[]`;
+      selectAceroCupla.classList.add('form-select', 'mb-3');
+      selectAceroCupla.multiple = true;
+      (diamData[d].GRADO_ACERO_CUPLA || []).forEach(item => {
+        const opt = document.createElement('option');
+        opt.value = item;
+        opt.textContent = item;
+        selectAceroCupla.appendChild(opt);
+      });
+      sectionDiv.appendChild(selectAceroCupla);
+
+      // TIPO_DE_CUPLA
+      const labelTipoCupla = document.createElement('label');
+      labelTipoCupla.classList.add('form-label');
+      labelTipoCupla.textContent = 'TIPO DE CUPLA (seleccione):';
+      sectionDiv.appendChild(labelTipoCupla);
+
+      const selectTipoCupla = document.createElement('select');
+      selectTipoCupla.name = `tipo_cupla_${d}[]`;
+      selectTipoCupla.classList.add('form-select', 'mb-3');
+      selectTipoCupla.multiple = true;
+      (diamData[d].TIPO_DE_CUPLA || []).forEach(item => {
+        const opt = document.createElement('option');
+        opt.value = item;
+        opt.textContent = item;
+        selectTipoCupla.appendChild(opt);
+      });
+      sectionDiv.appendChild(selectTipoCupla);
+
+      // Agregamos todo al contenedor
+      optionsContainer.appendChild(sectionDiv);
+    });
+  });
 </script>
 {% endblock %}
 
