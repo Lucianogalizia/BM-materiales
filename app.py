@@ -132,7 +132,7 @@ def flujo_a():
         if ajuste == "SI":
             # Cargar Excel de ajuste de medida
             try:
-                file_path = os.path.join("materiales", "ajuste_de_medida(2).xlsx")  # Ajusta la ruta
+                file_path = os.path.join("Materiales", "ajuste_de_medida(2).xlsx")  # Ajusta la ruta
                 df = pd.read_excel(file_path)
                 df.columns = df.columns.str.strip()
                 df["DIÁMETRO"] = df["DIÁMETRO"].astype(str).str.strip()
