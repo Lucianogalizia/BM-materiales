@@ -24,7 +24,7 @@ def flujo_A():
         ajuste_medida = request.form.get('ajuste_medida')
         if ajuste_medida == "SI":
             try:
-                file_path = os.path.join('materiales', 'ajuste_de_medida.xlsx')
+                file_path = os.path.join('materiales', 'ajuste de medida(2).xlsx')
                 df = pd.read_excel(file_path)
                 df.columns = df.columns.str.strip()
                 df["DIÁMETRO"] = df["DIÁMETRO"].astype(str).str.strip()
