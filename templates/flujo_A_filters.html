@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}FLUJO A - Filtros{% endblock %}
+{% block content %}
+<h2>FLUJO A: Filtros para Ajuste de medida</h2>
+<form method="POST" action="{{ url_for('flujo_A_filters') }}">
+  <div class="mb-3">
+    <label class="form-label">Seleccione DIÁMETRO(s):</label>
+    <select class="form-select" name="diametros" multiple required>
+      {% for diam in diametros %}
+      <option value="{{ diam }}">{{ diam }}</option>
+      {% endfor %}
+    </select>
+    <small class="form-text text-muted">Use Ctrl/Cmd para seleccionar múltiples opciones.</small>
+  </div>
+  {% for diam in diametros %}
+  <h4>Opciones para DIÁMETRO: {{ diam }}</h4>
+  <div class="mb-3">
+    <label class="form-label">TIPO (separe los valores con comas):</label>
+    <input type="text" class="form-control" name="tipo_{{ diam }}" placeholder="Ejemplo: A,B,C">
+  </div>
+  <div class="mb-3">
+    <label class="form-label">GRADO ACERO:</label>
+    <input type="text" class="form-control" name="acero_{{ diam }}" placeholder="Seleccionar o ingresar">
+  </div>
+  <div class="mb-3">
+    <label class="form-label">ACERO CUPLA:</label>
+    <input type="text" class="form-control" name="acero_cup_{{ diam }}" placeholder="Seleccionar o ingresar">
+  </div>
+  <div class="mb-3">
+    <label class="form-label">TIPO CUPLA:</label>
+    <input type="text" class="form-control" name="tipo_cup_{{ diam }}" placeholder="Seleccionar o ingresar">
+  </div>
+  {% endfor %}
+  <button type="submit" class="btn btn-success">Aplicar Filtros y Continuar a FLUJO H</button>
+</form>
+{% endblock %}
+
+
