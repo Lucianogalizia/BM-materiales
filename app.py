@@ -25,7 +25,7 @@ def renombrar_columnas(df):
 def load_excel_file():
     try:
         # Se asume que el archivo Excel se encuentra en la carpeta "data"
-        file_path = os.path.join('data', 'ajuste_de_medida.xlsx')
+        file_path = os.path.join('materiales', 'ajuste de medida(2).xlsx')
         df = pd.read_excel(file_path)
         df.columns = df.columns.str.strip()
         df["DIÁMETRO"] = df["DIÁMETRO"].astype(str).str.strip()
