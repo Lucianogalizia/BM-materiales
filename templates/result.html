@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Resultados Finales{% endblock %}
+{% block content %}
+<h2>Listado final de materiales de todos los flujos</h2>
+{% for flow, df in materiales_finales %}
+<div class="card mb-3">
+  <div class="card-header">
+    <strong>{{ flow }}</strong>
+  </div>
+  <div class="card-body">
+    <pre>{{ df.to_string() }}</pre>
+  </div>
+</div>
+{% endfor %}
+<a href="{{ url_for('index') }}" class="btn btn-primary">Reiniciar Proceso</a>
+{% endblock %}
