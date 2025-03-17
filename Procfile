@@ -1,1 +1,2 @@
-web: gunicorn app:app --timeout 120 --workers 1
+web: voila BOMBEO MECANICO(2).ipynb --port=$PORT --no-browser
+
