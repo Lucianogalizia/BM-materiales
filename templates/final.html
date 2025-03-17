@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Listado Final de Materiales</title>
+</head>
+<body>
+  <h1>Listado Final de Materiales</h1>
+  {% for flow, df in materiales_finales %}
+    <h2>{{ flow }}</h2>
+    <div>
+      {{ df.to_html() | safe }}
+    </div>
+    <hr>
+  {% endfor %}
+</body>
+</html>
