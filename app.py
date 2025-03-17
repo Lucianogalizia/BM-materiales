@@ -4,7 +4,7 @@ import pandas as pd
 from jinja2 import DictLoader
 
 app = Flask(__name__)
-app.secret_key = 'tu_clave_secreta'  # Cambia esta clave por una segura
+app.secret_key = 'LUCIANO123'  # Cambia esta clave por una segura
 
 # Global para almacenar los DataFrames finales de cada flujo
 materiales_finales = []
