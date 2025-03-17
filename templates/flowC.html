@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Flujo C - Tubería de Baja</title>
+</head>
+<body>
+  <h1>Flujo C: Tubería de Baja</h1>
+  <form method="post">
+    <h2>Seleccione DIÁMETRO(s):</h2>
+    <select name="diametro" multiple required>
+      {% for d in diametros %}
+        <option value="{{ d }}">{{ d }}</option>
+      {% endfor %}
+    </select><br><br>
+    
+    <h2>Seleccione DIÁMETRO CSG:</h2>
+    <select name="diametro_csg" required>
+      <option value="TODOS">TODOS</option>
+      {% for csg in csg_options %}
+        <option value="{{ csg }}">{{ csg }}</option>
+      {% endfor %}
+    </select><br><br>
+    
+    <h2>Ingrese cantidades:</h2>
+    <p>Formato: diam:tipo: cantidad (Ej: 10:A:5,20:B:10)</p>
+    <input type="text" name="quantity_info" placeholder="10:A:5,20:B:10"><br><br>
+    
+    <button type="submit">Aplicar Filtros</button>
+  </form>
+</body>
+</html>
