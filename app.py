@@ -53,7 +53,7 @@ def flujo_A_filters():
             'acero_cup': request.form.get(f"acero_cup_{diam}"),
             'tipo_cup': request.form.get(f"tipo_cup_{diam}")
         }
-    file_path = os.path.join('materiales', 'ajuste_de_medida.xlsx')
+    file_path = os.path.join('materiales', 'ajuste de medida(2).xlsx')
     df = pd.read_excel(file_path)
     df.columns = df.columns.str.strip()
     # Aplicar la lógica de filtrado (simplificada)
