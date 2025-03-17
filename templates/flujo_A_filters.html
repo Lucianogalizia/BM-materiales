@@ -1,38 +1,65 @@
 {% extends "base.html" %}
-{% block title %}FLUJO A - Filtros{% endblock %}
+{% block title %}Filtrar por DIÁMETRO{% endblock %}
 {% block content %}
-<h2>FLUJO A: Filtros para Ajuste de medida</h2>
-<form method="POST" action="{{ url_for('flujo_A_filters') }}">
-  <div class="mb-3">
-    <label class="form-label">Seleccione DIÁMETRO(s):</label>
-    <select class="form-select" name="diametros" multiple required>
-      {% for diam in diametros %}
-      <option value="{{ diam }}">{{ diam }}</option>
-      {% endfor %}
-    </select>
-    <small class="form-text text-muted">Use Ctrl/Cmd para seleccionar múltiples opciones.</small>
-  </div>
+<h1>FLUJO A: Filtros para DIÁMETRO seleccionados</h1>
+<form method="POST" action="{{ url_for('flujo_a_apply') }}">
   {% for diam in diametros %}
-  <h4>Opciones para DIÁMETRO: {{ diam }}</h4>
-  <div class="mb-3">
-    <label class="form-label">TIPO (separe los valores con comas):</label>
-    <input type="text" class="form-control" name="tipo_{{ diam }}" placeholder="Ejemplo: A,B,C">
-  </div>
-  <div class="mb-3">
-    <label class="form-label">GRADO ACERO:</label>
-    <input type="text" class="form-control" name="acero_{{ diam }}" placeholder="Seleccionar o ingresar">
-  </div>
-  <div class="mb-3">
-    <label class="form-label">ACERO CUPLA:</label>
-    <input type="text" class="form-control" name="acero_cup_{{ diam }}" placeholder="Seleccionar o ingresar">
-  </div>
-  <div class="mb-3">
-    <label class="form-label">TIPO CUPLA:</label>
-    <input type="text" class="form-control" name="tipo_cup_{{ diam }}" placeholder="Seleccionar o ingresar">
-  </div>
+    <h3>DIÁMETRO: {{ diam }}</h3>
+    <!-- Se envía el DIÁMETRO seleccionado en un campo oculto -->
+    <input type="hidden" name="diametros" value="{{ diam }}">
+    <div class="form-group">
+      <label for="tipo_{{ diam }}">TIPO (selección múltiple):</label>
+      <select multiple class="form-control" name="tipo_{{ diam }}" id="tipo_{{ diam }}">
+        {% set subset = df[df["DIÁMETRO"] == diam] %}
+        {% set tipos = subset["TIPO"].dropna().unique() | list | sort %}
+        {% for tipo in tipos %}
+          {% if tipo.upper() != "TODOS" %}
+            <option value="{{ tipo }}">{{ tipo }}</option>
+          {% endif %}
+        {% endfor %}
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="acero_{{ diam }}">GRADO DE ACERO:</label>
+      <select class="form-control" name="acero_{{ diam }}" id="acero_{{ diam }}">
+        <option value="Seleccionar" selected>Seleccionar</option>
+        {% set acero_vals = subset["GRADO DE ACERO"].dropna().unique() | list | sort %}
+        {% for val in acero_vals %}
+          {% if val.upper() != "TODOS" %}
+            <option value="{{ val }}">{{ val }}</option>
+          {% endif %}
+        {% endfor %}
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="acero_cup_{{ diam }}">GRADO DE ACERO CUPLA:</label>
+      <select class="form-control" name="acero_cup_{{ diam }}" id="acero_cup_{{ diam }}">
+        <option value="Seleccionar" selected>Seleccionar</option>
+        {% set acero_cup_vals = subset["GRADO DE ACERO CUPLA"].dropna().unique() | list | sort %}
+        {% for val in acero_cup_vals %}
+          {% if val.upper() != "TODOS" %}
+            <option value="{{ val }}">{{ val }}</option>
+          {% endif %}
+        {% endfor %}
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="tipo_cup_{{ diam }}">TIPO DE CUPLA:</label>
+      <select class="form-control" name="tipo_cup_{{ diam }}" id="tipo_cup_{{ diam }}">
+        <option value="Seleccionar" selected>Seleccionar</option>
+        {% set tipo_cup_vals = subset["TIPO DE CUPLA"].dropna().unique() | list | sort %}
+        {% for val in tipo_cup_vals %}
+          {% if val.upper() != "TODOS" %}
+            <option value="{{ val }}">{{ val }}</option>
+          {% endif %}
+        {% endfor %}
+      </select>
+    </div>
+    <hr>
   {% endfor %}
-  <button type="submit" class="btn btn-success">Aplicar Filtros y Continuar a FLUJO H</button>
+  <button type="submit" class="btn btn-success">Aplicar Filtros</button>
 </form>
 {% endblock %}
+
 
 
