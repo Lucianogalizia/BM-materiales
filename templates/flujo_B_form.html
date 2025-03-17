@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}FLUJO B - Confirmar Tubing{% endblock %}
+{% block content %}
+<h2>FLUJO B: Confirmar Tubing</h2>
+<form method="POST" action="{{ url_for('flujo_B_submit') }}">
+  <div class="mb-3">
+    <label class="form-label">Seleccione DIÁMETRO(s):</label>
+    <select class="form-select" name="diametros" multiple required>
+      {% for diam in diametros %}
+      <option value="{{ diam }}">{{ diam }}</option>
+      {% endfor %}
+    </select>
+    <small class="form-text text-muted">Use Ctrl/Cmd para seleccionar múltiples opciones.</small>
+  </div>
+  {% for diam in diametros %}
+  <div class="mb-3">
+    <label class="form-label">Cantidad para {{ diam }}:</label>
+    <input type="number" step="any" class="form-control" name="qty_{{ diam }}" required>
+  </div>
+  {% endfor %}
+  <button type="submit" class="btn btn-success">Aplicar y Continuar a FLUJO C</button>
+</form>
+{% endblock %}
