@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}FLUJO A - Ajuste de medida{% endblock %}
+{% block content %}
+<h2>FLUJO A: Ajuste de medida</h2>
+<form method="POST">
+  <div class="mb-3">
+    <label for="ajuste_medida" class="form-label">¿Ajuste de medida?</label>
+    <select class="form-select" id="ajuste_medida" name="ajuste_medida" required>
+      <option value="" disabled selected>Seleccionar</option>
+      <option value="SI">SI</option>
+      <option value="NO">NO</option>
+    </select>
+  </div>
+  <button type="submit" class="btn btn-primary">Continuar</button>
+</form>
+{% endblock %}
