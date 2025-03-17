@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Seleccionar DIÁMETRO{% endblock %}
+{% block content %}
+<h1>FLUJO A: Selección de DIÁMETRO</h1>
+<form method="POST">
+  <div class="form-group">
+    <label for="diametros">Seleccione DIÁMETRO(s):</label>
+    <select multiple class="form-control" name="diametros" id="diametros">
+      {% for diam in all_diams %}
+        <option value="{{ diam }}">{{ diam }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <button type="submit" class="btn btn-primary">Siguiente</button>
+</form>
+{% endblock %}
